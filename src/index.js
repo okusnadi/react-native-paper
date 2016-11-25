@@ -11,6 +11,7 @@ export { default as Checkbox } from './components/Checkbox';
 export { default as Paper } from './components/Paper';
 export { default as RadioButton } from './components/RadioButton';
 export { default as TouchableRipple } from './components/TouchableRipple';
+export { default as TextInput } from './components/TextInput';
 
 export { default as Caption } from './components/Typography/Caption';
 export { default as Headline } from './components/Typography/Headline';
@@ -22,4 +23,3 @@ export { default as Text } from './components/Typography/Text';
 export { default as Divider } from './components/Divider';
 export { default as Drawer } from './components/Drawer';
 export { default as GridView } from './components/GridView';
-
