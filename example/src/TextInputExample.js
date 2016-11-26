@@ -53,7 +53,7 @@ export default class TextInputExample extends Component {
         <TextInput
           containerStyle={styles.inputContainerStyle}
           floatingLabelFixed
-          errorText={this.validateEmail(this.state.text4) ? '' : 'Please enter a valid email'}
+          errorText={this._validateEmail(this.state.text4) ? '' : 'Please enter a valid email'}
           placeholder='Hint text'
           floatingLabelText='Floating Label Fixed'
           value={this.state.text4}
