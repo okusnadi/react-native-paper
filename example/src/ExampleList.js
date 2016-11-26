@@ -14,6 +14,7 @@ import {
   TouchableRipple,
   Divider,
 } from 'react-native-paper';
+import BottomSheetExample from './BottomSheetExample';
 import ButtonExample from './ButtonExample';
 import CardExample from './CardExample';
 import CheckboxExample from './CheckboxExample';
@@ -25,6 +26,7 @@ import RadioButtonExample from './RadioButtonExample';
 import TextExample from './TextExample';
 
 export const examples = {
+  bottomSheet: BottomSheetExample,
   button: ButtonExample,
   card: CardExample,
   checkbox: CheckboxExample,
