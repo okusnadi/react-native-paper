@@ -1,6 +1,6 @@
 /* @flow */
 
-import css, { insertGlobal } from 'next/css';
+import { style, insertGlobal } from 'glamor';
 
 insertGlobal(`
   html {
@@ -10,14 +10,14 @@ insertGlobal(`
     box-sizing: inherit;
   }
   html, body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     margin: 0;
     padding: 0;
-    color: '#555',
+    color: #333;
   }
 `);
 
-const styles = css({
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
+const styles = style({
   lineHeight: 1.5,
 });
 

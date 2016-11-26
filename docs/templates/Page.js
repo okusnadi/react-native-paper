@@ -1,39 +1,74 @@
 /* @flow */
 
 import React from 'react';
-import css from 'next/css';
-import Link from 'next/link';
+import { style } from 'glamor';
 import mono from './styles/mono';
+import Link from './Link';
 
-const wrapper = css({
+const wrapper = style({
   display: 'flex',
-  flexDirection: 'row',
   height: '100vh',
+  flexDirection: 'column',
+
+  '@media(min-width: 640px)': {
+    flexDirection: 'row',
+  },
 });
 
-const sidebar = css({
-  width: '240px',
-  padding: '16px',
+const sidebar = style({
+  padding: '24px',
   backgroundColor: '#f0f0f0',
-  overflow: 'auto',
+  display: 'none',
+
+  '@media(min-width: 640px)': {
+    display: 'block',
+    height: '100%',
+    width: '240px',
+    overflow: 'auto',
+  },
 });
 
-const content = css({
+const content = style({
   flex: 1,
-  height: '100%',
-  overflow: 'auto',
+
+  '@media(min-width: 640px)': {
+    height: '100%',
+    overflow: 'auto',
+  },
 });
 
-const separator = css({
+const menuButton = style({
+  display: 'none',
+
+  '&:checked ~ nav': {
+    display: 'block',
+  },
+});
+
+const menuIcon = style({
+  fontSize: '24px',
+  cursor: 'pointer',
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  padding: '24px',
+  zIndex: 10,
+
+  '@media(min-width: 640px)': {
+    display: 'none',
+  },
+});
+
+const separator = style({
   border: 0,
   backgroundColor: '#ddd',
   height: '1px',
-  margin: '8px',
+  margin: '4px 0',
 });
 
-const link = css({
+const link = style({
   display: 'block',
-  margin: '8px',
+  padding: '4px 0',
   textDecoration: 'none',
   opacity: 0.32,
 
@@ -42,28 +77,39 @@ const link = css({
   },
 });
 
-const active = css({
+const active = style({
   opacity: 1,
 });
 
-export default function Body({ url, pages, children }: any) {
+export default function Body({ name, pages, children }: any) {
   return (
     <div {...wrapper}>
-      <div {...sidebar}>
-        <Link href='/'>
-          <a {...mono} {...link} {...(url.pathname === '/' ? active : null)}>
-            Home
-          </a>
+      <input
+        {...menuButton}
+        id='slide-sidebar'
+        type='checkbox'
+        role='button'
+      />
+      <label htmlFor='slide-sidebar'>
+        <span {...menuIcon}>☰</span>
+      </label>
+      <nav {...sidebar}>
+        <Link to='index' {...mono} {...link} {...(name === 'index' ? active : null)}>
+          Home
         </Link>
         <hr {...separator} />
         {pages.map(page =>
-          <Link key={page} href={`/${page.toLowerCase()}`}>
-            <a {...mono} {...link} {...(url.pathname === '/' + page.toLowerCase() ? active : null)}>
-              {page}
-            </a>
+          <Link
+            key={page.name}
+            to={page.name.toLowerCase()}
+            {...mono}
+            {...link}
+            {...(name === page.name.toLowerCase() ? active : null)}
+          >
+            {page.name}
           </Link>
         )}
-      </div>
+      </nav>
       <div {...content}>
         {children}
       </div>
