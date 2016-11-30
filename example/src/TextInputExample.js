@@ -16,8 +16,7 @@ export default class TextInputExample extends Component {
   static title = 'TextInput';
 
   state = {
-    text: '',
-    text2: '',
+    text2: 'React Native Paper',
     text3: '',
     text4: '',
     text5: '',
@@ -28,22 +27,14 @@ export default class TextInputExample extends Component {
     return (
       <View style={styles.container}>
         <TextInput
-          containerStyle={styles.inputContainerStyle}
-          placeholder='Hint text'
-          value={this.state.text}
-          onChangeText={text => this.setState({ text })}
-        />
-        <TextInput
-          containerStyle={styles.inputContainerStyle}
-          placeholder='Hint text'
+          style={styles.inputContainerStyle}
           floatingLabelText='Primary Color'
           value={this.state.text2}
           onChangeText={text2 => this.setState({ text2 })}
         />
         <TextInput
-          containerStyle={styles.inputContainerStyle}
+          style={styles.inputContainerStyle}
           secureTextEntry
-          placeholder='Hint text'
           floatingLabelText='Custom Color'
           value={this.state.text3}
           onChangeText={text3 => this.setState({ text3 })}
@@ -51,10 +42,9 @@ export default class TextInputExample extends Component {
           underlineColor={Colors.amber500}
         />
         <TextInput
-          containerStyle={styles.inputContainerStyle}
+          style={styles.inputContainerStyle}
           floatingLabelFixed
           errorText={this._validateEmail(this.state.text4) ? '' : 'Please enter a valid email'}
-          placeholder='Hint text'
           floatingLabelText='Floating Label Fixed'
           value={this.state.text4}
           onChangeText={text4 => this.setState({ text4 })}
@@ -62,13 +52,10 @@ export default class TextInputExample extends Component {
           underlineColor={Colors.pink500}
         />
         <TextInput
-          containerStyle={styles.inputContainerStyle}
-          editable={false}
-          placeholder='Disabled'
+          disabled
+          style={styles.inputContainerStyle}
           floatingLabelFixed
           floatingLabelText='Floating Label Fixed'
-          floatingLabelColor={Colors.pinkA700}
-          underlineColor={Colors.pinkA700}
         />
       </View>
     );

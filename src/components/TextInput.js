@@ -15,12 +15,13 @@ import {
 import Text from './Typography/Text';
 import withTheme from '../core/withTheme';
 import { red500 } from '../styles/colors';
+import type { Theme } from '../types/Theme';
+
 
 const AnimatedText = Animated.createAnimatedComponent(Text);
 
 type Props = {
-  containerStyle?: any;
-  editable?: boolean;
+  disabled?: boolean;
   errorText?: string;
   errorTextColor?: string;
   floatingLabelColor?: string;
@@ -28,21 +29,21 @@ type Props = {
   floatingLabelText?: string;
   inputStyle?: any;
   onChangeText?: Function;
-  underlineShow?: boolean;
   underlineColor?: string;
+  onFocus?: Function;
+  onBlur?: Function;
+  style?: any;
   value?: string;
-  placeholder: string;
-  placeholderTextColor: string;
-  theme: any;
+  theme: Theme;
 }
 
 type DefaultProps = {
-  editable: boolean;
+  disabled: boolean;
   errorTextColor: string;
-  underlineShow: boolean;
 }
 
 type State = {
+  animatedVal: any;
   focused: boolean;
   text: string;
 }
@@ -51,14 +52,20 @@ type State = {
  * TextInputs allow users to input text.
  * **Usage:**
  * ```
- * const MyComponent = () => (
- *  <TextInput
- *    placeholder='Hint text'
- *    floatingLabelText='Email'
- *    value={this.state.text}
- *    onChangeText={text => this.setState({ text })}
- *  />
- * );
+ * class MyComponent extends React.Component {
+ *   state = {
+ *    text: ''
+ *   };
+ *   render(){
+ *    return (
+ *     <TextInput
+ *      floatingLabelText='Email'
+ *      value={this.state.text}
+ *      onChangeText={text => this.setState({ text })}
+ *    />
+      );
+    }
+  }
  * ```
  *
  * @extends TextInput props https://facebook.github.io/react-native/docs/textinput.html#props
@@ -69,84 +76,60 @@ class TextInput extends Component<DefaultProps, Props, State> {
 
   static propTypes = {
     /**
-    * The style of the container element.
+    * If true, user won't be able to interact with the component. The default value is false
     */
-    containerStyle: View.propTypes.style,
+    disabled: PropTypes.bool,
     /**
-    * If false, text is not editable. The default value is true.
-    */
-    editable: PropTypes.bool,
-    /**
-    * The error string to display.
+    * The error string to display
     */
     errorText: PropTypes.string,
     /**
-    * The color to use for the error text.
+    * The color to use for the error text
     */
     errorTextColor: PropTypes.string,
     /**
-    * The color to use for the floating label element.
+    * The color to use for the floating label element
     */
     floatingLabelColor: PropTypes.string,
     /**
-    * If true, the floating label will float even when there is no value entered.
+    * If true, the floating label will float even when there is no value entered
     */
     floatingLabelFixed: PropTypes.bool,
     /**
-    * The text to use for the floating label element.
+    * The text to use for the floating label element
     */
     floatingLabelText: PropTypes.string,
     /**
-    * Define the style of the underlying TextInput element.
+    * Define the style of the underlying TextInput element
     */
     inputStyle: View.propTypes.style,
     /**
-    * Callback that is called when the text input's text changes. Changed text is passed as an argument to the callback handler.
+    * Callback that is called when the text input's text changes. Changed text is passed as an argument to the callback handler
     */
     onChangeText: PropTypes.func,
     /**
-    * If true, shows the underline for the text input.
-    */
-    underlineShow: PropTypes.bool,
-    /**
-    * The color to use for the underline element.
+    * The color to use for the underline element
     */
     underlineColor: PropTypes.string,
+    /**
+    * The style of the container element
+    */
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
+    style: View.propTypes.style,
     value: PropTypes.string,
-    /**
-    * The hint string to display.
-    */
-    placeholder: PropTypes.string,
-    /**
-    * The text color of the placeholder string.
-    */
-    placeholderTextColor: PropTypes.string,
     theme: PropTypes.object.isRequired,
   }
 
   static defaultProps = {
-    editable: true,
+    disabled: false,
     errorTextColor: red500,
-    underlineShow: true,
   }
 
   constructor(props: Props) {
     super(props);
-    this.animatedVal = new Animated.Value(0);
-    this.animationTimingStart = Animated.timing(this.animatedVal,
-      {
-        toValue: 1,
-        duration: 180,
-        easing: Easing.easing,
-      });
-    this.animationTimingEnd = Animated.timing(this.animatedVal,
-      {
-        toValue: 0,
-        duration: 180,
-        easing: Easing.easing,
-      });
-
     this.state = {
+      animatedVal: new Animated.Value(0),
       focused: false,
       text: props.value || '',
     };
@@ -155,35 +138,51 @@ class TextInput extends Component<DefaultProps, Props, State> {
   state: State;
 
   componentDidMount() {
-    const text = this.props.value;
-    if (text || text !== '') {
-      this._handleFocus();
+    if (this.props.value !== '') {
+      this._startFocusAnimation();
     }
   }
 
-  animatedVal: Object;
-
-  animationTimingStart: Function;
-
-  animationTimingEnd: Function;
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (prevState.focused !== this.state.focused) {
+      if (this.state.focused) {
+        this._startFocusAnimation();
+      } else {
+        if (this.state.text === '') {
+          this._startBlurAnimation();
+        }
+      }
+    }
+  }
 
   _root: any;
-
   _setRef = (c: Object) => (this._root = c);
 
+  _startFocusAnimation = () => Animated.timing(this.state.animatedVal,
+    {
+      toValue: 1,
+      duration: 180,
+      easing: Easing.easing,
+    }).start();
+
+  _startBlurAnimation = () => Animated.timing(this.state.animatedVal,
+    {
+      toValue: 0,
+      duration: 180,
+      easing: Easing.easing,
+    }).start();
+
   _handleFocus = () => {
-    this.setState({ focused: true }, () => {
-      global.requestAnimationFrame(() => this.animationTimingStart.start());
-    });
+    this.setState({ focused: true });
+    if (this.props.onFocus) {
+      this.props.onFocus();
+    }
   }
 
   _handleBlur = () => {
-    if (!this.state.text || this.state.text === '') {
-      this.setState({ focused: false }, () => {
-        global.requestAnimationFrame(() => this.animationTimingEnd.start());
-      });
-    } else {
-      this.setState({ focused: false });
+    this.setState({ focused: false });
+    if (this.props.onBlur) {
+      this.props.onBlur();
     }
   }
 
@@ -206,20 +205,25 @@ class TextInput extends Component<DefaultProps, Props, State> {
     return this._root.clear(...args);
   }
 
+  focus(...args) {
+    return this._root.focus(...args);
+  }
+
+  blur(...args) {
+    return this._root.blur(...args);
+  }
+
   render() {
     const {
-      containerStyle,
-      editable,
+      style,
+      disabled,
       errorText,
       errorTextColor,
       floatingLabelColor,
       floatingLabelFixed,
       floatingLabelText,
       inputStyle,
-      underlineShow,
       underlineColor,
-      placeholder,
-      placeholderTextColor,
       theme,
     } = this.props;
     const { focused } = this.state;
@@ -227,11 +231,12 @@ class TextInput extends Component<DefaultProps, Props, State> {
     const fontFamily = fonts.regular;
     const primaryColor = colors.primary;
     const inactiveColor = colors.disabled;
-    const placeholderColor = placeholderTextColor || inactiveColor;
     const floating = floatingLabelText && floatingLabelText !== '';
-    let inputTextColor, labelColor, bottomLineColor, placeholderText, bottomLineComponent;
+    // FIXME: Handle if the user sends rgba or hex value
+    const underlineShow = underlineColor !== 'transparent';
+    let inputTextColor, labelColor, bottomLineColor, bottomLineComponent;
 
-    if (editable) {
+    if (!disabled) {
       inputTextColor = colors.text;
       labelColor = floatingLabelColor || primaryColor;
       bottomLineColor = focused ? (underlineColor || primaryColor) : inactiveColor;
@@ -239,25 +244,15 @@ class TextInput extends Component<DefaultProps, Props, State> {
       inputTextColor = labelColor = bottomLineColor = inactiveColor;
     }
 
-    if (floating) {
-      if (floatingLabelFixed) {
-        placeholderText = placeholder;
-      } else {
-        placeholderText = focused ? placeholder : '';
-      }
-    } else {
-      placeholderText = placeholder;
-    }
-
-    const labelColorAnimation = this.animatedVal.interpolate({
+    const labelColorAnimation = this.state.animatedVal.interpolate({
       inputRange: [ 0, 1 ],
       outputRange: [ inactiveColor, (errorText && errorText !== '') ? errorTextColor : labelColor ],
     });
-    const translateYAnimation = this.animatedVal.interpolate({
+    const translateYAnimation = this.state.animatedVal.interpolate({
       inputRange: [ 0, 1 ],
       outputRange: [ 4, -12 ],
     });
-    const fontSizeAnimation = this.animatedVal.interpolate({
+    const fontSizeAnimation = this.state.animatedVal.interpolate({
       inputRange: [ 0, 1 ],
       outputRange: [ 16, 12 ],
     });
@@ -271,7 +266,7 @@ class TextInput extends Component<DefaultProps, Props, State> {
 
     const bottomLineStyle = {
       backgroundColor: (errorText && errorText !== '') ? errorTextColor : bottomLineColor,
-      transform: [ { scaleX: (errorText && errorText !== '') ? 1 : this.animatedVal } ],
+      transform: [ { scaleX: (errorText && errorText !== '') ? 1 : this.state.animatedVal } ],
     };
 
     if (Platform.OS === 'android') {
@@ -281,7 +276,7 @@ class TextInput extends Component<DefaultProps, Props, State> {
     } else {
       bottomLineComponent = (
         <View style={[ styles.bottomLineContainer, { backgroundColor: inactiveColor } ]}>
-            {underlineShow && editable &&
+            {underlineShow && !disabled &&
               <Animated.View
                 style={[ styles.bottomLine, bottomLineStyle ]}
               />}
@@ -290,39 +285,42 @@ class TextInput extends Component<DefaultProps, Props, State> {
     }
 
     return (
-            <View style={[ containerStyle ]}>
-                {floating && <AnimatedText style={[ styles.label, labelStyle ]}>
-                  {floatingLabelText}
-                </AnimatedText>}
-                <View style={{ marginHorizontal: 2 }}>
-                  <NativeTextInput
-                    {...this.props}
-                    ref={this._setRef}
-                    selectionColor={labelColor}
-                    placeholder={placeholderText}
-                    placeholderTextColor={placeholderColor}
-                    onFocus={this._handleFocus}
-                    onBlur={this._handleBlur}
-                    underlineColorAndroid='transparent'
-                    style={[ styles.input, {
-                      color: inputTextColor,
-                      fontFamily,
-                      marginTop: floating ? 8 : 0,
-                    }, inputStyle ]}
-                    onChangeText={this._handleChangeText}
-                  />
-                  {bottomLineComponent}
-                  {(errorText && errorText !== '') ?
-                  <Text style={[ styles.errorText, { fontFamily, color: errorTextColor } ]}>
-                    {errorText}
-                  </Text> : null}
-                </View>
-            </View>
-        );
+      <View style={[ style ]}>
+          {floating && <AnimatedText style={[ styles.label, labelStyle ]}>
+            {floatingLabelText}
+          </AnimatedText>}
+          <View style={styles.container}>
+            <NativeTextInput
+              {...this.props}
+              editable={!disabled}
+              ref={this._setRef}
+              selectionColor={labelColor}
+              placeholder={''}
+              onFocus={this._handleFocus}
+              onBlur={this._handleBlur}
+              underlineColorAndroid='transparent'
+              style={[ styles.input, {
+                color: inputTextColor,
+                fontFamily,
+                marginTop: floating ? 8 : 0,
+              }, inputStyle ]}
+              onChangeText={this._handleChangeText}
+            />
+            {bottomLineComponent}
+            {(errorText && errorText !== '') ?
+            <Text style={[ styles.errorText, { fontFamily, color: errorTextColor } ]}>
+              {errorText}
+            </Text> : null}
+          </View>
+      </View>
+    );
   }
 }
 
 const styles = StyleSheet.create({
+  container: {
+    marginHorizontal: 2,
+  },
   label: {
     position: 'absolute',
     left: 1,
