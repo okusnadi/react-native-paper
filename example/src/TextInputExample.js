@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import {
-  View,
+  ScrollView,
   StyleSheet,
 } from 'react-native';
 import {
@@ -26,7 +26,7 @@ export default class TextInputExample extends Component {
   _validateEmail = email => /\S+@\S+/.test(email);
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView keyboardShouldPersistTaps style={styles.container}>
         <TextInput
           style={styles.inputContainerStyle}
           floatingLabelText='Primary Color'
@@ -67,7 +67,7 @@ export default class TextInputExample extends Component {
           style={styles.inputContainerStyle}
           floatingLabelText='Disabled Input'
         />
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -79,6 +79,6 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   inputContainerStyle: {
-    marginVertical: 8,
+    margin: 8,
   },
 });

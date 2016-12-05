@@ -10,7 +10,6 @@ import {
     TextInput as NativeTextInput,
     Easing,
     StyleSheet,
-    PixelRatio,
 } from 'react-native';
 import Text from './Typography/Text';
 import withTheme from '../core/withTheme';
@@ -71,6 +70,8 @@ type State = {
  *
  */
 
+const INPUT_HEIGHT = 64;
+
 class TextInput extends Component<DefaultProps, Props, State> {
 
   static propTypes = {
@@ -113,6 +114,7 @@ class TextInput extends Component<DefaultProps, Props, State> {
     /**
     * The style of the container element
     */
+    numberOfLines: PropTypes.number,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
     style: View.propTypes.style,
@@ -200,8 +202,6 @@ class TextInput extends Component<DefaultProps, Props, State> {
     const primaryColor = colors.primary;
     const inactiveColor = colors.disabled;
     const floating = floatingLabelText && floatingLabelText !== '';
-    // FIXME: Handle if the user sends rgba or hex value
-    const underlineShow = underlineColor !== 'transparent';
 
     let inputTextColor, labelColor, bottomLineColor;
 
@@ -219,7 +219,7 @@ class TextInput extends Component<DefaultProps, Props, State> {
     });
     const translateYAnimation = this.state.focused.interpolate({
       inputRange: [ 0, 1 ],
-      outputRange: [ 0, -12 ],
+      outputRange: [ 22, 0 ],
     });
     const fontSizeAnimation = this.state.focused.interpolate({
       inputRange: [ 0, 1 ],
@@ -231,7 +231,7 @@ class TextInput extends Component<DefaultProps, Props, State> {
       fontFamily,
       fontSize: floatingLabelFixed || this.props.value ? 12 : fontSizeAnimation,
       transform: [
-        { translateY: floatingLabelFixed || this.props.value ? -12 : translateYAnimation },
+        { translateY: floatingLabelFixed || this.props.value ? 0 : translateYAnimation },
       ],
     };
 
@@ -247,71 +247,71 @@ class TextInput extends Component<DefaultProps, Props, State> {
     };
 
     return (
-      <View style={[ style ]}>
-        {floating && <AnimatedText style={[ styles.label, labelStyle ]}>
+      <View style={style}>
+        <AnimatedText pointerEvents='none' style={[ styles.label, labelStyle ]}>
           {floatingLabelText}
-        </AnimatedText>}
-        <View style={styles.container}>
-          <NativeTextInput
-            {...this.props}
-            editable={!disabled}
-            ref={this._setRef}
-            selectionColor={labelColor}
-            placeholder=''
-            onFocus={this._handleFocus}
-            onBlur={this._handleBlur}
-            underlineColorAndroid='transparent'
-            style={[ styles.input, {
+        </AnimatedText>
+        <NativeTextInput
+          {...this.props}
+          editable={!disabled}
+          ref={this._setRef}
+          selectionColor={labelColor}
+          placeholder=''
+          onFocus={this._handleFocus}
+          onBlur={this._handleBlur}
+          underlineColorAndroid='transparent'
+          style={[
+            styles.input,
+            {
               color: inputTextColor,
               fontFamily,
               marginTop: floating ? 8 : 0,
-            }, inputStyle ]}
-          />
-          <View style={styles.bottomLineContainer}>
-          <View
-            style={[ styles.bottomLine, { backgroundColor: inactiveColor, height: 2 / PixelRatio.get() } ]}
-          />
-          {underlineShow && !disabled &&
-            <Animated.View
-              style={[ styles.bottomLine, bottomLineStyle ]}
-            />}
-          </View>
-          {(errorText && errorText !== '') ?
+            },
+            inputStyle,
+          ]}
+        />
+        <View pointerEvents='none' style={styles.bottomLineContainer}>
+          <View style={[ styles.bottomLine, { backgroundColor: inactiveColor } ]} />
+          <Animated.View style={[ styles.bottomLine, styles.focusLine, bottomLineStyle ]} />
+        </View>
+        {errorText ?
           <Text style={[ styles.errorText, { fontFamily, color: errorTextColor } ]}>
             {errorText}
-          </Text> : null}
-        </View>
+          </Text> : null
+        }
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: 2,
-  },
   label: {
     position: 'absolute',
-    left: 1,
-    top: 15,
+    left: 0,
+    top: 16,
     fontSize: 16,
   },
   input: {
     fontSize: 16,
-    minHeight: 44,
+    height: INPUT_HEIGHT,
+    paddingTop: 20,
+    paddingBottom: 0,
+    marginTop: 8,
     marginBottom: -4,
   },
   bottomLineContainer: {
     marginBottom: 4,
-    height: 6 / PixelRatio.get(),
-    overflow: 'hidden',
+    height: StyleSheet.hairlineWidth * 4,
   },
   bottomLine: {
     position: 'absolute',
     left: 0,
     right: 0,
     top: 0,
-    height: 6 / PixelRatio.get(),
+    height: StyleSheet.hairlineWidth,
+  },
+  focusLine: {
+    height: StyleSheet.hairlineWidth * 4,
   },
   errorText: {
     fontSize: 11,
