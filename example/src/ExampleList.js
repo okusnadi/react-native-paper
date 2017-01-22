@@ -20,6 +20,7 @@ import CheckboxExample from './CheckboxExample';
 import DividerExample from './DividerExample';
 import GridViewExample from './GridViewExample';
 import PaperExample from './PaperExample';
+import ProgressExample from './ProgressExample';
 import RippleExample from './RippleExample';
 import RadioButtonExample from './RadioButtonExample';
 import TextExample from './TextExample';
@@ -32,6 +33,7 @@ export const examples = {
   divider: DividerExample,
   grid: GridViewExample,
   paper: PaperExample,
+  progress: ProgressExample,
   ripple: RippleExample,
   radio: RadioButtonExample,
   text: TextExample,
