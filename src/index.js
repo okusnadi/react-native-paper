@@ -9,6 +9,7 @@ export { default as Provider } from './core/Provider';
 export { default as DefaultTheme } from './styles/DefaultTheme';
 export { default as ThemedPortal } from './components/Portal/ThemedPortal';
 
+export { default as BottomSheet } from './components/BottomSheet';
 export { default as Button } from './components/Button';
 export { default as Card } from './components/Card';
 export { default as Checkbox } from './components/Checkbox';
