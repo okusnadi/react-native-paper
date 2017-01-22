@@ -28,6 +28,7 @@ type Props = {
   inputStyle?: any;
   onChangeText?: Function;
   underlineColor?: string;
+  numberOfLines: number;
   onFocus?: Function;
   onBlur?: Function;
   style?: any;
@@ -111,12 +112,12 @@ class TextInput extends Component<DefaultProps, Props, State> {
     * The color to use for the underline element
     */
     underlineColor: PropTypes.string,
-    /**
-    * The style of the container element
-    */
     numberOfLines: PropTypes.number,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
+    /**
+    * The style of the container element
+    */
     style: View.propTypes.style,
     value: PropTypes.string,
     theme: PropTypes.object.isRequired,
