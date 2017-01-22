@@ -27,6 +27,7 @@ import RippleExample from './RippleExample';
 import RadioButtonExample from './RadioButtonExample';
 import TextExample from './TextExample';
 import TextInputExample from './TextInputExample';
+import SearchExample from './SearchExample';
 
 export const examples = {
   bottomSheet: BottomSheetExample,
@@ -42,6 +43,7 @@ export const examples = {
   radio: RadioButtonExample,
   text: TextExample,
   textInput: TextInputExample,
+  search: SearchExample,
 };
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
